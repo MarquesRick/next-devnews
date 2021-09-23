@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 
 interface IComment {
@@ -25,6 +25,22 @@ export default function Post({ comments }: ICommentsProps) {
     </div>
   );
 }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const response = await fetch('http://localhost:3333/posts');
+  const posts = await response.json();
+
+  const paths = posts.map(post => {
+    return {
+      params: { id: String(post.id) },
+    };
+  });
+
+  return {
+    paths,
+    fallback: false,
+  };
+};
 
 /**Gera as páginas de forma estática no build da aplicacao, ou seja, ao buildar realiza as consultas e monta o html */
 export const getStaticProps: GetStaticProps<ICommentsProps> = async context => {
