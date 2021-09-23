@@ -1,3 +1,4 @@
+import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
 
 interface IPost {
@@ -5,17 +6,22 @@ interface IPost {
   title: string;
 }
 
-export default function Home() {
-  const [posts, setPosts] = useState<IPost[]>([]);
+interface IHomeProps {
+  posts: IPost[];
+}
 
-  useEffect(() => {
-    fetch('http://localhost:3333/posts').then(response => {
-      response.json().then(data => {
-        setPosts(data);
-      });
-    });
-  }, []);
+export default function Home({ posts }: IHomeProps) {
   /*Client Side Render*/
+  // const [posts, setPosts] = useState<IPost[]>([]);
+
+  // useEffect(() => {
+  //   fetch('http://localhost:3333/posts').then(response => {
+  //     response.json().then(data => {
+  //       setPosts(data);
+  //     });
+  //   });
+  // }, []);
+
   return (
     <div>
       <h1>Posts</h1>
@@ -27,3 +33,15 @@ export default function Home() {
     </div>
   );
 }
+
+/**Server side - tela montada no node */
+export const getServerSideProps: GetServerSideProps<IHomeProps> = async () => {
+  const response = await fetch('http://localhost:3333/posts');
+  const posts = await response.json();
+
+  return {
+    props: {
+      posts,
+    },
+  };
+};
