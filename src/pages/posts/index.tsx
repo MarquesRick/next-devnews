@@ -1,7 +1,9 @@
 import { GetStaticProps } from 'next';
+import Prismic from '@prismicio/client';
 import Link from 'next/link';
-import styles from './posts.module.scss';
 import SEO from '../../components/SEO';
+import { getPrismicClient } from '../../services/prismic';
+import styles from './posts.module.scss';
 
 interface IPost {
   id: string;
@@ -34,6 +36,17 @@ export default function Posts() {
 
 /**Gera as páginas de forma estática no build da aplicacao, ou seja, ao buildar realiza as consultas e monta o html */
 export const getStaticProps: GetStaticProps = async () => {
+  const prismic = getPrismicClient();
+
+  const response = await prismic.query(
+    [Prismic.predicates.at('document.type', 'pos')],
+    {
+      fetch: ['pos.title', 'pos.content'],
+    },
+  );
+
+  console.log(response);
+
   return {
     props: {},
     revalidate: 60 * 60 * 12, //12 horas
